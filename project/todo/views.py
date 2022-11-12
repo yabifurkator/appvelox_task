@@ -52,7 +52,7 @@ def create_new_task(request):
             message='new ask added'
         )
 
-    except (json.decoder.JSONDecodeError, KeyError):
+    except (json.decoder.JSONDecodeError, KeyError, ValueError):
         return todo_response(
             response=HttpResponse(status=400),
             message='json doesn\'t exists or invalid'
@@ -80,7 +80,7 @@ def get_task_by_id(request):
             message='task with id={} found'.format(pk)
         )
 
-    except (json.decoder.JSONDecodeError, KeyError):
+    except (json.decoder.JSONDecodeError, KeyError, ValueError):
         return todo_response(
             response=HttpResponse(status=400),
             message='json doesn\'t exists or invalid'
@@ -91,13 +91,13 @@ def get_task_by_id(request):
             response=HttpResponse(status=403),
             message='task with id={} does not exist'.format(pk)
         )
-
+    
     except Exception as ex:
         return todo_response(
             response=HttpResponse(status=500),
             message=get_message_from_exception(ex)
         )
-     
+    
 
 @csrf_exempt
 def complete_task_by_id(request):
@@ -121,7 +121,7 @@ def complete_task_by_id(request):
             message='task with id={} completed'.format(pk)
         )
     
-    except (json.decoder.JSONDecodeError, KeyError):
+    except (json.decoder.JSONDecodeError, KeyError, ValueError):
         return todo_response(
             response=HttpResponse(status=400),
             message='json doesn\'t exists or invalid'
@@ -138,7 +138,7 @@ def complete_task_by_id(request):
             response=HttpResponse(status=500),
             message=get_message_from_exception(ex)
         )
-
+    
 
 @csrf_exempt
 def delete_task_by_id(request):
@@ -151,7 +151,7 @@ def delete_task_by_id(request):
             message='task with id={} deleted'.format(pk)
         )
     
-    except (json.decoder.JSONDecodeError, KeyError):
+    except (json.decoder.JSONDecodeError, KeyError, ValueError):
         return todo_response(
             response=HttpResponse(status=400),
             message='json doesn\'t exists or invalid'
