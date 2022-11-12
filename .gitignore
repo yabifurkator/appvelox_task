@@ -1,0 +1,9 @@
+venv/
+client/__pycache__/
+client/commands.txt
+
+project/todo/migrations/
+project/project/__pycache__/
+project/todo/migrations/__pycache__/
+project/todo/__pycache__/
+project/db.sqlite3
