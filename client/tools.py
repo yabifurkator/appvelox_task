@@ -17,3 +17,7 @@ def format_task(task):
         completed = '✘'
 
     return [pk, title, text, completion_date, completed]
+
+
+def http_response_to_str(response):
+    return str(response) + ' -> ' + response.headers['message']

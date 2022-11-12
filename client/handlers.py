@@ -1,12 +1,24 @@
-import requests
 import json
-from tabulate import tabulate
 from datetime import datetime
+from dataclasses import dataclass
+
+from tabulate import tabulate
+import requests
 
 from exceptions import WrongCommandFormat
-from tools import format_task, FORMATTED_TASK_COLUMNS
-from config import URL
 
+from tools import \
+    format_task, \
+    http_response_to_str, \
+    FORMATTED_TASK_COLUMNS
+
+from config import URL, HELP_MSG
+
+
+@dataclass
+class HandlerReturn:
+    http_response: str
+    handler_response: str
 
 def get_all_tasks(command):
     if len(command) != 1:
@@ -16,9 +28,11 @@ def get_all_tasks(command):
     response = requests.get(url=url)
     tasks_list = json.loads(response.json())
     tasks_formatted = [format_task(task) for task in tasks_list]
-    
-    print(response)
-    print(tabulate(tasks_formatted, headers=FORMATTED_TASK_COLUMNS))
+
+    return HandlerReturn(
+        http_response=http_response_to_str(response=response),
+        handler_response='\n' + tabulate(tasks_formatted, headers=FORMATTED_TASK_COLUMNS)
+    ) 
     
 
 def create_new_task(command):
@@ -37,7 +51,10 @@ def create_new_task(command):
     url = URL + 'new/'
     response = requests.post(url=url, json=task_json)
 
-    print(response)
+    return HandlerReturn(
+        http_response=http_response_to_str(response=response),
+        handler_response=None
+    )
 
 
 def get_task_by_id(command):
@@ -48,23 +65,35 @@ def get_task_by_id(command):
     data_json = json.dumps(data)
     url = URL + 'get/'
     response = requests.get(url=url, json=data_json)
-    task_list = json.loads(response.json())
+    try:
+        task_list = json.loads(response.json())
+    except json.decoder.JSONDecodeError:
+        task_list = []
     tasks_formatted = [format_task(task) for task in task_list]
 
-    print(response)
-    print(tabulate(tasks_formatted, headers=FORMATTED_TASK_COLUMNS))
+    return HandlerReturn(
+        http_response=http_response_to_str(response=response),
+        handler_response=('\n' + tabulate(tasks_formatted, headers=FORMATTED_TASK_COLUMNS))
+            if len(tasks_formatted) != 0 else '-'
+    )
 
 
 def complete_task_by_id(command):
     if len(command) != 2:
         raise WrongCommandFormat(reason='количество слов в команде не равно двум.')
 
-    data = {'pk': command[1]}
+    data = {
+        'pk': command[1],
+        'completion_date': datetime.now().strftime('%d-%m-%Y')
+    }
     data_json = json.dumps(data)
     url = URL + 'complete/'
     response = requests.post(url=url, json=data_json)
 
-    print(response)
+    return HandlerReturn(
+        http_response=http_response_to_str(response=response),
+        handler_response=None
+    )
 
 
 def delete_task_by_id(command):
@@ -76,4 +105,17 @@ def delete_task_by_id(command):
     url = URL + 'delete/'
     response = requests.post(url=url, json=data_json)
 
-    print(response)
+    return HandlerReturn(
+        http_response=http_response_to_str(response=response),
+        handler_response=None
+    )
+
+
+def help_handler(command):
+    if len(command) != 1:
+        raise WrongCommandFormat(reason='количество слов в команде не равно единице.')
+
+    return HandlerReturn(
+        http_response=None,
+        handler_response=HELP_MSG
+    )    
