@@ -20,4 +20,8 @@ def format_task(task):
 
 
 def http_response_to_str(response):
-    return str(response) + ' -> ' + response.headers['message']
+    try:
+        message = response.headers['message']
+        return str(response) + ' -> ' + message
+    except:
+        return str(response)     
