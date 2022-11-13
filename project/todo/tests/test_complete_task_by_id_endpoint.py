@@ -42,6 +42,24 @@ class CompleteTaskByIdEndpointTestCase(APITestCase):
         self.assertEqual(task.completion_date.month, today_date.month)
         self.assertEqual(task.completion_date.year, today_date.year)
 
+    def test_complete_nonexistent_task(self):
+        tasks = Task.objects.all()
+        self.assertEqual(tasks.count(), 3)
+        self.assertEqual(tasks[0].pk, 1)
+        self.assertEqual(tasks[1].pk, 2)
+        self.assertEqual(tasks[2].pk, 3)
+
+        data_json = {
+            'pk': 4,
+            'completion_date': datetime.now().strftime('%d-%m-%Y')
+        }
+        response = self.client.post(
+            path=self.url,
+            data=data_json,
+            format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertRaises(Task.DoesNotExist, Task.objects.get, pk=4)
 
     def test_wrong_http_method(self):
         tasks = Task.objects.all()

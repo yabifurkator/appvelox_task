@@ -44,6 +44,23 @@ class GetTaskByIdEndpointTestCase(APITestCase):
         self.assertEqual(task.title, 'test_title2')
         self.assertEqual(task.text, 'test_text2')
 
+    def test_get_nonexistent_tast(self):
+        tasks = Task.objects.all()
+        self.assertEqual(tasks.count(), 3)
+        self.assertEqual(tasks[0].pk, 1)
+        self.assertEqual(tasks[1].pk, 2)
+        self.assertEqual(tasks[2].pk, 3)
+
+        data_json = {'pk': 4}
+        response = self.client.generic(
+            method='GET',
+            path=self.url,
+            data=json.dumps(data_json),
+            content_type='application/json'
+        )
+        self.assertRaises(Task.DoesNotExist, Task.objects.get, pk=4)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_wrong_http_method(self):
         tasks = Task.objects.all()
         self.assertEqual(tasks.count(), 3)
