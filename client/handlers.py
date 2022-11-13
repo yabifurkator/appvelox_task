@@ -42,12 +42,11 @@ def create_new_task(command):
     title = command[1]
     text = command[2]
 
-    task = {
+    task_json = {
         'title': title,
         'text': text
     }
 
-    task_json = json.dumps(task)
     url = URL + 'new/'
     response = requests.post(url=url, json=task_json)
 
@@ -61,8 +60,8 @@ def get_task_by_id(command):
     if len(command) != 2:
         raise WrongCommandFormat(reason='количество слов в команде не равно двум.')
 
-    data = {'pk': command[1]}
-    data_json = json.dumps(data)
+    data_json = {'pk': command[1]}
+
     url = URL + 'get/'
     response = requests.get(url=url, json=data_json)
     try:
@@ -82,11 +81,11 @@ def complete_task_by_id(command):
     if len(command) != 2:
         raise WrongCommandFormat(reason='количество слов в команде не равно двум.')
 
-    data = {
+    data_json = {
         'pk': command[1],
         'completion_date': datetime.now().strftime('%d-%m-%Y')
     }
-    data_json = json.dumps(data)
+
     url = URL + 'complete/'
     response = requests.post(url=url, json=data_json)
 
@@ -100,8 +99,7 @@ def delete_task_by_id(command):
     if len(command) != 2:
         raise WrongCommandFormat(reason='количество слов в команде не равно двум.')
 
-    data = {'pk': command[1]}
-    data_json = json.dumps(data)
+    data_json = {'pk': command[1]}
     url = URL + 'delete/'
     response = requests.post(url=url, json=data_json)
 

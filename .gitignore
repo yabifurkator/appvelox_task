@@ -7,3 +7,5 @@ project/project/__pycache__/
 project/todo/migrations/__pycache__/
 project/todo/__pycache__/
 project/db.sqlite3
+
+project/todo/tests/__pycache__/

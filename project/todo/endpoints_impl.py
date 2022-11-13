@@ -27,9 +27,21 @@ def get_all_tasks_endpoint_impl(request):
 
 
 def create_new_task_endpoint_impl(request):
-    task_fields = json.loads(json.loads(request.body))
+    task_fields = json.loads(request.body)
     title = task_fields['title']
     text = task_fields['text']
+
+    if not title:
+        return todo_response(
+            response=HttpResponse(status=400),
+            message='title must be not empty'
+        )
+    
+    if not text:
+        return todo_response(
+            response=HttpResponse(status=400),
+            message='text must be not empty'
+        )
 
     task = Task(
         title=title,
@@ -44,7 +56,7 @@ def create_new_task_endpoint_impl(request):
 
 
 def get_task_by_id_endpoint_impl(request):
-    pk = json.loads(json.loads(request.body))['pk']
+    pk = json.loads(request.body)['pk']
     try:
         task = Task.objects.get(pk=pk)
     except Task.DoesNotExist:
@@ -66,7 +78,7 @@ def get_task_by_id_endpoint_impl(request):
 
 
 def complete_task_by_id_endpoint_impl(request):
-    json_object = json.loads(json.loads(request.body))
+    json_object = json.loads(request.body)
     pk = json_object['pk']
     completion_date = json_object['completion_date']
     try:
@@ -93,7 +105,7 @@ def complete_task_by_id_endpoint_impl(request):
 
 
 def delete_task_by_id_endpoint_impl(request):
-    pk = json.loads(json.loads(request.body))['pk']
+    pk = json.loads(request.body)['pk']
     try:
         task = Task.objects.get(pk=pk)
     except Task.DoesNotExist:
